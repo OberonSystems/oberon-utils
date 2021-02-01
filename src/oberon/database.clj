@@ -91,26 +91,27 @@
 
 ;;; --------------------------------------------------------------------------------
 
-(def +datasource+)
+(def ^:dynamic *datasource*)
 (def ^:dynamic *connection*)
 
-(defn set-datasource!
-  [ds]
-  (alter-var-root (var +datasource+) (constantly ds)))
-
-(defmacro with-connection [& body]
-  `(with-open [connection# (jdbc/get-connection +datasource+)]
-     (binding [*connection* connection#]
+(defmacro with-datasource [datasource & body]
+  `(let [datasource# ~datasource]
+     (binding [*datasource* datasource#]
        ~@body)))
 
-(defmacro in-transaction [& body]
-  `(jdbc/with-transaction [tx# *connection*]
-     ~@body))
+(defmacro with-connection [& body]
+  `(with-open [connection# (jdbc/get-connection *datasource*)]
+     (binding [*connection* connection#]
+       ~@body)))
 
 (defmacro in-transaction* [& body]
   `(with-connection
      (jdbc/with-transaction [tx# *connection*]
        ~@body)))
+
+(defmacro in-transaction [& body]
+  `(jdbc/with-transaction [tx# *connection*]
+     ~@body))
 
 ;;; --------------------------------------------------------------------------------
 
