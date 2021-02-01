@@ -1,0 +1,21 @@
+{:paths   ["src"]
+ :deps    {org.clojure/clojure      {:mvn/version "1.10.1"}
+           org.clojure/core.memoize {:mvn/version "1.0.236"}
+           ;;
+           org.postgresql/postgresql {:mvn/version "42.2.18"}
+           seancorfield/next.jdbc    {:mvn/version "1.1.613"}
+           ;;
+           camel-snake-kebab/camel-snake-kebab {:mvn/version "0.4.2"}}
+ ;;
+ ;; emacs: cider-jack-in-clj
+ ;;
+ ;; -- Testing
+ ;; clojure -M:test:runner-clj
+ ;; clojure -M:test:runner-cljs
+ :aliases {:test    {:extra-paths ["test"]
+                     :extra-deps  {org.clojure/test.check {:mvn/version "1.1.0"}}}
+           :runner  {:extra-deps  {com.cognitect/test-runner
+                                   {:git/url "https://github.com/cognitect-labs/test-runner"
+                                    :sha "b6b3193fcc42659d7e46ecd1884a228993441182"}}
+                     :main-opts  ["-m" "cognitect.test-runner"
+                                  "-d" "test"]}}}
