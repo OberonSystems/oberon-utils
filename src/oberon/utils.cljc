@@ -143,9 +143,19 @@
   [s n]
   (subs s 0 (min (count s) n)))
 
+(defn clean-string
+  [s]
+  (some-> s
+          s/trim
+          (nil-when-> s/blank?)))
+
 (defn join-cleanly
   ([coll]       (join-cleanly " " coll))
-  ([delim coll] (some->> coll (remove s/blank?) seq (s/join delim))))
+  ([delim coll] (some->> coll
+                         (map clean-string)
+                         (remove nil?)
+                         seq
+                         (s/join delim))))
 
 #?(:cljs
    (defn format
