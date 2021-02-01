@@ -6,16 +6,27 @@
            seancorfield/next.jdbc    {:mvn/version "1.1.613"}
            ;;
            camel-snake-kebab/camel-snake-kebab {:mvn/version "0.4.2"}}
- ;;
- ;; emacs: cider-jack-in-clj
- ;;
- ;; -- Testing
- ;; clojure -M:test:runner-clj
- ;; clojure -M:test:runner-cljs
- :aliases {:test    {:extra-paths ["test"]
+ :aliases {
+           ;; emacs: cider-jack-in-clj
+           ;;
+           ;; -- Testing
+           ;; clojure -M:test:runner-clj
+           ;; clojure -M:test:runner-cljs
+           :test    {:extra-paths ["test"]
                      :extra-deps  {org.clojure/test.check {:mvn/version "1.1.0"}}}
            :runner  {:extra-deps  {com.cognitect/test-runner
                                    {:git/url "https://github.com/cognitect-labs/test-runner"
                                     :sha "b6b3193fcc42659d7e46ecd1884a228993441182"}}
                      :main-opts  ["-m" "cognitect.test-runner"
-                                  "-d" "test"]}}}
+                                  "-d" "test"]}
+           ;;
+           ;; clojure -M:cider-clj
+           :cider-clj {:extra-deps {nrepl/nrepl       {:mvn/version "0.8.3"}
+                                    cider/cider-nrepl {:mvn/version "0.25.4"}}
+                       :main-opts  ["-m"           "nrepl.cmdline"
+                                    "--middleware" "[cider.nrepl/cider-middleware]"]}
+           ;;
+           ;; - start an interactive REPL with a headless nREPL server
+           ;; clojure -M:nrepl
+           :nrepl {:extra-deps {nrepl/nrepl {:mvn/version "0.8.3"}}
+                   :main-opts  ["-m" "nrepl.cmdline" "-i"]}}}
