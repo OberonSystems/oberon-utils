@@ -115,6 +115,16 @@
 
 ;;; --------------------------------------------------------------------------------
 
+(defn util-date->sql-date
+  [^java.util.Date v]
+  (when v
+    (java.sql.Date. (.getTime v))))
+
+(defn sql-date->util-date
+  [^java.sql.Date v]
+  (when v
+    (java.util.Date. (.getTime v))))
+
 (defn to-sql-array
   "Warning: assumes *connection* is bound."
   ([coll]
@@ -134,6 +144,8 @@
                      (if (keyword? (first coll))
                        (->> coll (map name) to-array)
                        (to-array coll))))))
+
+;;;
 
 (defn get-column-names
   [^ResultSetMetaData rsmeta]
