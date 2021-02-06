@@ -194,17 +194,16 @@
                       not)
               boolean)))
 
-(defn insert-record
-  "Woefully inefficient way of getting data but will suffice for now."
+(defn insert-row
   [tablename record]
   (sql/insert! *connection* (->snake-case-string tablename) (as-pg-map record)))
 
-(defn update-record
+(defn update-rows
   "Woefully inefficient way of getting data but will suffice for now."
   [tablename record where]
   (sql/update! *connection* (->snake-case-string tablename) (as-pg-map record) (as-pg-map where)))
 
-(defn delete-record
+(defn delete-rows
   "Woefully inefficient way of getting data but will suffice for now."
   [tablename where]
   (sql/delete! *connection* (->snake-case-string tablename) (as-pg-map where)))
