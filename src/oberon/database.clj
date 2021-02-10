@@ -8,7 +8,7 @@
             ;;
             [camel-snake-kebab.extras :as cske]
             ;;
-            [oberon.utils :refer [->kebab-case-keyword ->screaming-snake-case-string ->snake-case-string]])
+            [oberon.utils :as utils])
   (:import [org.postgresql.util PGobject]
            [java.sql
             Array
@@ -24,6 +24,26 @@
 (defn-   ^:private set-tmp!
   [value]
   (swap! tmp (constantly value)))
+
+;;; --------------------------------------------------------------------------------
+;;  Sometimes we need to override how the translations happen, ie,
+;;  maybe we want to cache aggressively or handle the alpha/digit
+;;  barrier in words differently to the default csk way of doing it.
+;;
+;;  Or maybe we are integrating with some sort of system that has
+;;  really weird casing for particular field names.
+
+(defonce ->kebab-case-keyword          utils/->kebab-case-keyword)
+(defonce ->snake-case-string           utils/->snake-case-string)
+(defonce ->screaming-snake-case-string utils/->screaming-snake-case-string)
+
+(defn register-case-coercions!
+  [->kebab-case-keyword-fn
+   ->snake-case-string-fn
+   ->screaming-snake-case-string-fn]
+  (alter-var-root (var ->kebab-case-keyword)          (constantly (or ->kebab-case-keyword-fn           utils/->kebab-case-keyword)))
+  (alter-var-root (var ->snake-case-string)           (constantly (or ->snake-case-string-fn            utils/->snake-case-string)))
+  (alter-var-root (var ->screaming-snake-case-string) (constantly (or ->screaming-snake-case-string-fn  utils/->screaming-snake-case-string))))
 
 ;;; --------------------------------------------------------------------------------
 
