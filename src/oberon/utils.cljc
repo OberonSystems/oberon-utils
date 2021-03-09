@@ -190,9 +190,9 @@
 (defn digit?
   [c]
   #?(:clj  (Character/isDigit c)
-     :cljs (let [zero (.charCodeAt "0" 0)
-                 nine (.charCodeAt "9" 0)]
-             (<= zero c nine))))
+     :cljs (let [zero (.charCodeAt "0")
+                 nine (.charCodeAt "9")]
+             (<= zero (.charCodeAt c) nine))))
 
 (defn non-alphas?
   [s]
