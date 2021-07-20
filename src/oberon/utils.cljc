@@ -208,10 +208,14 @@
      (keyword s)
      (keyword ns s))))
 
-(defn suffix-key
-  [k suffix]
-  (keyword-ns (str (name k) "-" (name suffix))
-              (namespace k)))
+(defn join-keys
+  [& ks]
+  (when-let [k (some->> ks
+                        (remove nil?)
+                        seq
+                        (map name)
+                        (s/join "-"))]
+    (keyword-ns k (-> ks first namespace))))
 
 (let [-prefix-key (fn [k-str p-str ns]
                     (-> (str p-str k-str)
