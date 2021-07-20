@@ -198,3 +198,92 @@
   [s]
   (some->> (re-seq #"[^a-zA-Z ]+" s)
            (s/join ", ")))
+
+;;; --------------------------------------------------------------------------------
+
+(defn- keyword-ns
+  ([s] (keyword s))
+  ([s ns]
+   (if (nil? ns)
+     (keyword s)
+     (keyword ns s))))
+
+(let [-prefix-key (fn [k-str p-str ns]
+                    (-> (str p-str k-str)
+                        (keyword-ns ns)))]
+  (defn prefix-key
+    [k prefix & {:keys [ns]}]
+    (let [k-str (name k)
+          p-str (str (name prefix) "-")
+          ns    (or (some-> ns name)
+                    (namespace prefix)
+                    (namespace k))]
+      (-prefix-key k-str p-str ns)))
+
+  (defn make-prefix-key
+    [prefix & {:keys [ns]}]
+    (let [p-str (str (name prefix) "-")
+          ns    (or (some-> ns name)
+                    (namespace prefix))]
+      (if ns
+        #(-prefix-key (name %) p-str ns)
+        #(-prefix-key (name %) p-str (namespace %))))))
+
+(let [-unprefix-key (fn [k-str p-str ns]
+                      (when (and (s/starts-with? k-str p-str)
+                                 (< (count p-str) (count k-str)))
+                        (-> (subs k-str (count p-str) (count k-str))
+                            (keyword-ns ns))))]
+  (defn unprefix-key
+    [k prefix & {:keys [ns]}]
+    (let [k-str (name k)
+          p-str (str (name prefix) "-")
+          ns    (or (some-> ns name)
+                    (namespace prefix)
+                    (namespace k))]
+      (-unprefix-key (name k) (str (name prefix) "-") ns)))
+
+  (defn make-unprefix-key
+    [prefix & {:keys [ns]}]
+    (let [p-str (str (name prefix) "-")
+          ns    (or (some-> ns name)
+                    (namespace prefix))]
+      (if ns
+        #(-unprefix-key (name %) p-str ns)
+        #(-unprefix-key (name %) p-str (namespace %))))))
+
+(defn prefix-keys
+  [coll prefix & {:keys [ns]}]
+  (let [prefix-k (make-prefix-key prefix :ns ns)]
+    (if (map? coll)
+      (->> (map (fn [[k v]] [(prefix-k k) v]) coll)
+           (into {}))
+      ;; Assume it's a seq of keywords
+      (map prefix-k coll))))
+
+(defn unprefix-keys
+  [coll prefix & {:keys [ns]}]
+  (let [unprefix-k (make-unprefix-key prefix :ns ns)]
+    (if (map? coll)
+      (->> (map (fn [[k v]] [(unprefix-k k) v]) coll)
+           (into {}))
+      ;; Assume it's a seq of keywords
+      (map unprefix-k coll))))
+
+(defn nest-map
+  [m parent-key & {:keys [ns]}]
+  (reduce-kv (fn [acc k v]
+               (if-let [child-key (unprefix-key k parent-key :ns ns)]
+                 (-> acc
+                     (assoc-in [parent-key child-key] v)
+                     (dissoc   k))
+                 (assoc acc k v)))
+             {}
+             m))
+
+(defn unnest-map
+  [m parent-key & {:keys [ns]}]
+  (merge (dissoc m parent-key)
+         (prefix-keys (get m parent-key)
+                      parent-key
+                      :ns ns)))
