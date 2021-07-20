@@ -2,6 +2,11 @@
   (:require [clojure.test :refer :all]
             [oberon.utils :refer :all]))
 
+(deftest test-suffix-keys
+  (is (= (suffix-key :one       :test)    :one-test))
+  (is (= (suffix-key :one    :ns/test)    :one-test))
+  (is (= (suffix-key :ns/one    :test) :ns/one-test)))
+
 (deftest test-prefix-unprefix-keys
   (is (= (prefix-key   :one      :test) :test-one))
   (is (= (unprefix-key :test-one :test) :one))

@@ -208,6 +208,11 @@
      (keyword s)
      (keyword ns s))))
 
+(defn suffix-key
+  [k suffix]
+  (keyword-ns (str (name k) "-" (name suffix))
+              (namespace k)))
+
 (let [-prefix-key (fn [k-str p-str ns]
                     (-> (str p-str k-str)
                         (keyword-ns ns)))]
