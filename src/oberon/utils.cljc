@@ -280,12 +280,12 @@
       (map unprefix-k coll))))
 
 (defn nest-map
-  [m parent-key & {:keys [ns]}]
+  [m parent-key & {:keys [ns nils?]}]
   (reduce-kv (fn [acc k v]
                (if-let [child-key (unprefix-key k parent-key :ns ns)]
-                 (-> acc
-                     (assoc-in [parent-key child-key] v)
-                     (dissoc   k))
+                 (cond-> (dissoc acc k)
+                   (or nils? (not (nil? v)))
+                   (assoc-in [parent-key child-key] v))
                  (assoc acc k v)))
              {}
              m))

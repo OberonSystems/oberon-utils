@@ -46,6 +46,24 @@
                  :two   2
                  :three 3}}))
 
+  (is (= (nest-map {:test-one   nil
+                    :test-two   nil
+                    :test-three nil
+                    :other      :a}
+                   :test)
+         {:other :a}))
+
+  (is (= (nest-map {:test-one   nil
+                    :test-two   nil
+                    :test-three nil
+                    :other      :a}
+                   :test
+                   :nils? true)
+         {:other :a
+          :test  {:one   nil
+                  :two   nil
+                  :three nil}}))
+
   (is (= (unnest-map {:test {:one   1
                              :two   2
                              :three 3}}
