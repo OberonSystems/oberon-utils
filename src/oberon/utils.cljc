@@ -4,6 +4,7 @@
                 [[goog.string :as gstring]
                  [goog.string.format]])
             ;;
+            [clojure.set    :refer [rename-keys]]
             [clojure.pprint :refer [pprint]]
             [clojure.string :as s]
             ;;
@@ -291,8 +292,10 @@
              m))
 
 (defn unnest-map
-  [m parent-key & {:keys [ns]}]
-  (merge (dissoc m parent-key)
-         (prefix-keys (get m parent-key)
-                      parent-key
-                      :ns ns)))
+  [m parent-key & {:keys [ns child-key renames]}]
+  (let [child-key (or child-key parent-key)]
+    (merge (dissoc m child-key)
+           (prefix-keys (-> (get m child-key)
+                            (rename-keys renames))
+                        parent-key
+                        :ns ns))))
