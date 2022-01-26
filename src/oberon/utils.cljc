@@ -202,6 +202,17 @@
 
 ;;; --------------------------------------------------------------------------------
 
+(defn map->nsmap
+  [m n]
+  (let [ns-name (if (keyword? n) (name n) n)]
+   (reduce-kv (fn [acc k v]
+                (let [new-kw (if (and (keyword? k)
+                                      (not (qualified-keyword? k)))
+                               (keyword ns-name (name k))
+                               k)]
+                  (assoc acc new-kw v)))
+              {} m)))
+
 (defn- keyword-ns
   ([s] (keyword s))
   ([s ns]
