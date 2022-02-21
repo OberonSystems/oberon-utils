@@ -203,7 +203,7 @@
 ;;; --------------------------------------------------------------------------------
 
 (defn map->nsmap
-  [m n]
+  [n m]
   (let [ns-name (if (keyword? n) (name n) n)]
    (reduce-kv (fn [acc k v]
                 (let [new-kw (if (and (keyword? k)
