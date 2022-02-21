@@ -213,6 +213,13 @@
                   (assoc acc new-kw v)))
               {} m)))
 
+(defn nsmap->map
+  [m]
+  (reduce-kv (fn [acc k v]
+               (let [new-kw (keyword (name k))]
+                 (assoc acc new-kw v)))
+             {} m))
+
 (defn- keyword-ns
   ([s] (keyword s))
   ([s ns]
