@@ -202,16 +202,22 @@
 
 ;;; --------------------------------------------------------------------------------
 
+(defn prefix-keyword
+  [prefix kw & {:keys [delim]
+              :or {delim "."}}]
+  (-> (str (name prefix) delim (name kw))
+      keyword))
+
 (defn map->nsmap
   [n m]
   (let [ns-name (if (keyword? n) (name n) n)]
-   (reduce-kv (fn [acc k v]
-                (let [new-kw (if (and (keyword? k)
-                                      (not (qualified-keyword? k)))
-                               (keyword ns-name (name k))
-                               k)]
-                  (assoc acc new-kw v)))
-              {} m)))
+    (reduce-kv (fn [acc k v]
+                 (let [new-kw (if (and (keyword? k)
+                                       (not (qualified-keyword? k)))
+                                (keyword ns-name (name k))
+                                k)]
+                   (assoc acc new-kw v)))
+               {} m)))
 
 (defn nsmap->map
   [m]
