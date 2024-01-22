@@ -242,3 +242,13 @@
                             (rename-keys renames))
                         parent-key
                         :ns ns))))
+
+;;; --------------------------------------------------------------------------------
+
+(defn nest-keys
+  "Selects the `ks` from the map `m` and assoc's them under the `k`,
+  then dissocs the `ks` from `m`."
+  [m k ks]
+  (as-> m m
+    (assoc  m k (select-keys m ks))
+    (apply dissoc m ks)))
