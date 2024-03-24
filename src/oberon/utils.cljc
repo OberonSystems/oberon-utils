@@ -3,6 +3,7 @@
                 [[goog.string :as gstring]
                  [goog.string.format]])
             ;;
+            [clojure.walk   :refer [postwalk]]
             [clojure.set    :refer [rename-keys]]
             [clojure.pprint :refer [pprint]]
             [clojure.string :as s]))
@@ -49,11 +50,33 @@
    x))
 
 ;;; --------------------------------------------------------------------------------
+
+(defn canonical-values
+  [m & {:keys [purge?]}]
+  ;; It is very common for values to be set to empty strings during
+  ;; JSONification in a browser, so fields that might otherwise be
+  ;; numbers, booleans, etc, can all become strings.  We trim and
+  ;; canonicalise to nil here to just avoid all that mess.
+  (postwalk #(cond
+               (and purge? (map-entry? %)) (if (-> % second nil?)
+                                             nil
+                                             %)
+               ;;
+               (and (vector? %) (empty? %)) nil
+               (and (list?   %) (empty? %)) nil
+               (and (map?    %) (empty? %)) nil
+               ;;
+               (string? %) (when-not (s/blank? %)
+                             (s/trim %))
+               :else %)
+            m))
+
+;;; --------------------------------------------------------------------------------
 ;;  Maps
 
 (defn map-entry
-   [k v]
-   (clojure.lang.MapEntry/create k v))
+  [k v]
+  (clojure.lang.MapEntry/create k v))
 
 (defn hash-map*
   [& [head & tail :as params]]
