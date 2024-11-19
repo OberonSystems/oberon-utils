@@ -79,6 +79,18 @@
     m
     (apply dissoc m ks)))
 
+(defn dissoc-in
+  ;; Snarfed from: https://whynotsoftware.github.io/wnaf-dissoc-in/
+  [m [k & knext :as ks]]
+  (cond
+    (and knext
+         (contains? (get-in m (butlast ks))
+                    (last ks)))
+    (update-in m (butlast ks) dissoc (last ks))
+    ;;
+    (not knext) (dissoc m k)
+    :else m))
+
 ;;; --------------------------------------------------------------------------------
 ;;  Maps
 
