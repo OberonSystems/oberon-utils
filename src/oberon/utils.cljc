@@ -170,6 +170,13 @@
   (-> (str (name prefix) delim (name kw))
       keyword))
 
+(defn prefix-keywords
+  [prefix ks & {:keys [delim]
+                :or {delim "."}}]
+  (let [prefix (str (name prefix) delim)]
+    (map #(-> prefix (str (name %)) keyword)
+         ks)))
+
 (defn map->nsmap
   [n m]
   (let [ns-name (if (keyword? n) (name n) n)]
